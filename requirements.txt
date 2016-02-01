@@ -1,0 +1,8 @@
+Django==1.9.1
+django-appconf==1.0.1
+django-compressor==2.0
+MySQL-python==1.2.5
+rcssmin==1.0.6
+rjsmin==1.0.12
+six==1.10.0
+wheel==0.24.0

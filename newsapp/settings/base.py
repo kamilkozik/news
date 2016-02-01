@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-from os.path import dirname, abspath
+from os.path import dirname, abspath, join
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
@@ -20,6 +20,7 @@ BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# TODO: implement some clever way for hiding secret key
 SECRET_KEY = '9c=o+i!2q4912m9ycpw2&!mzw6y#f-q&df)ty2z#66uj=!cp^='
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -39,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'compressor',
+    'news',
+    'person',
+
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -95,7 +100,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pl'
 
 TIME_ZONE = 'UTC'
 
@@ -110,3 +115,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = join(BASE_DIR, 'static')

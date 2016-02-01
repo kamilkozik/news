@@ -1,12 +1,14 @@
-from ..base import *
+# -*- coding: utf8 -*-
 
-DATABASE = {
+from newsapp.settings.base import *
+
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'news',
         'USER': 'kamil',
         'HOST': 'localhost',
-        'PORT': '8000',
+        'PORT': '',
         'PASSWORD': 'zaq12wsx',
     }
 }
