@@ -23,5 +23,5 @@ class Comment(models.Model):
     date_added = models.DateField(auto_now=True)
     date_modified = models.DateField(blank=True, null=True)
     is_authorized = models.BooleanField(default=False)
-    post = models.ForeignKey(Post)
+    post = models.ForeignKey(Post, related_name='comments')
     author = models.ForeignKey(Person)

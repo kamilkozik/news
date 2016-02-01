@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.generic.list import ListView
 
 from news.models import Post
@@ -12,3 +11,6 @@ class PostList(ListView):
         context = super(PostList, self).get_context_data()
         context['site_title'] = 'List of posts'
         return context
+
+    def get_queryset(self):
+        return super(PostList, self).get_queryset().prefetch_related('comments')
