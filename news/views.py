@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from django.shortcuts import render_to_response
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -28,6 +29,8 @@ class PostCreate(CreateView):
     def form_valid(self, form):
         if self.request.user.is_anonymous():
             form = PostForm()
-            return render_to_response('news/post_form.html', {'form': form})
+            errors = u'Aby dodać post musisz być zalogownay'
+            return render_to_response('news/post_form.html',
+                                      {'form': form, 'errors': errors})
         form.instance.author = self.request.user
         return super(PostCreate, self).form_valid(form)

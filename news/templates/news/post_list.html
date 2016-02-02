@@ -1,6 +1,11 @@
 {% extends 'global/base/base.html' %}
 
 {% block content %}
+
+    <div>
+        <a href="{% url 'news:add' %}">Dodaj post</a>
+    </div>
+
     <ul>
         {% for post in post_list %}
             <li>

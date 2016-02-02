@@ -1,6 +1,14 @@
 {% extends 'global/base/base.html' %}
 
 {% block content %}
+    <div>
+        <a href="{% url 'news:list' %}">Powrót</a>
+    </div>
+
+    <div class="error">
+        {{ errors }}
+    </div>
+
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
