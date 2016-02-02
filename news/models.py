@@ -1,10 +1,10 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
-from django.utils import timezone
 
-from person.models import Person
 
 
 class Post(models.Model):
@@ -15,7 +15,10 @@ class Post(models.Model):
     is_authorized = models.BooleanField(default=False)
     is_commentable = models.BooleanField(default=True)
     slug = models.SlugField()
-    author = models.ForeignKey(Person)
+    author = models.ForeignKey(User)
+
+    def get_absolute_url(self):
+        return reverse('news:list')
 
 
 class Comment(models.Model):
@@ -23,5 +26,5 @@ class Comment(models.Model):
     date_added = models.DateField(auto_now=True)
     date_modified = models.DateField(blank=True, null=True)
     is_authorized = models.BooleanField(default=False)
-    post = models.ForeignKey(Post, related_name='comments')
-    author = models.ForeignKey(Person)
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    author = models.ForeignKey(User)
