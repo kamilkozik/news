@@ -116,3 +116,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = join(BASE_DIR, 'static')
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # other finders..
+    'compressor.finders.CompressorFinder',
+]
+COMPRESS_PRECOMPILERS = (
+    ('text/less', 'lessc {infile} {outfile}',),
+)
+COMPRESS_ENABLED = True

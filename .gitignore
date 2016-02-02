@@ -1,2 +1,3 @@
 .info
 *.pyc
+static/CACHE/*

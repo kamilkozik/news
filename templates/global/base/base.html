@@ -1,10 +1,16 @@
+{% load staticfiles compress %}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <title>News | {{ site_title }}</title> {# TODO: Create context preprocessor and  add common var #}
 
+    {% compress css %}
+        <link type="text/less" href="{% static 'global/css/main.less' %}" rel="stylesheet"/>
+    {% endcompress %}
 
+    {% compress js %}
+    {% endcompress %}
 </head>
 <body>
 
