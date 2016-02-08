@@ -3,7 +3,11 @@
 {% block content %}
 
     <div>
-        <a href="{% url 'news:add' %}">Dodaj post</a>
+        <a href="{% url 'news:post:add' %}">Dodaj post</a>
+    </div>
+
+    <div class="error">
+        {{ errors }}
     </div>
 
     <ul>
@@ -21,7 +25,12 @@
                 {{ elem.date_added }}<br />
                 {{ elem.author }}<br />
             {% endfor %}
+            <form action="{% url 'news:comment:add' post_pk=post.pk %}" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Dodaj komentarz" />
+            </form>
+
         {% endfor %}
     </ul>
-
 {% endblock %}

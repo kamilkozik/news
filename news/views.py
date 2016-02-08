@@ -1,16 +1,17 @@
 # -*- coding: utf8 -*-
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
-from news.forms import PostForm
-from news.models import Post
+from news.forms import PostForm, CommentForm
+from news.models import Post, Comment
 
 
 class PostList(ListView):
     model = Post
     context_object_name = 'post_list'
-    form = PostForm()
+    form = CommentForm()
 
     def get_context_data(self, **kwargs):
         context = super(PostList, self).get_context_data()
@@ -34,3 +35,30 @@ class PostCreate(CreateView):
                                       {'form': form, 'errors': errors})
         form.instance.author = self.request.user
         return super(PostCreate, self).form_valid(form)
+
+
+class CommentCreate(CreateView):
+    model = Comment
+    fields = ['content']
+    post_obj = None
+    errors = u''
+    form = CommentForm()
+
+    def form_valid(self, form):
+        if self.request.user.is_anonymous():
+            self.errors = u'Aby dodawać komentarze musisz być zalogowany'
+            return render_to_response('news/post_list.html',
+                                      {'form': self.form,
+                                       'errors': self.errors})
+
+        post_pk = self.kwargs.get('post_pk', None)
+        try:
+            self.post_obj = Post.objects.get(pk=post_pk)
+        except ObjectDoesNotExist:
+            self.errors = u'Post nie istnieje'
+            return render_to_response('news/post_list.html',
+                                      {'form': self.form,
+                                       'errors': self.errors})
+        form.instance.author = self.request.user
+        form.instance.post = self.post_obj
+        return super(CommentCreate, self).form_valid(form)
