@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.query import Prefetch
 from django.shortcuts import render_to_response
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -20,7 +21,9 @@ class PostList(ListView):
         return context
 
     def get_queryset(self):
-        return super(PostList, self).get_queryset().prefetch_related('comments')
+        return super(PostList, self).get_queryset().prefetch_related(
+            Prefetch('comments', queryset=Comment.objects.filter(is_authorized=True))).\
+            filter(is_authorized=True)
 
 
 class PostCreate(CreateView):
