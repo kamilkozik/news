@@ -1,36 +1,50 @@
 {% extends 'global/base/base.html' %}
+{% load staticfiles %}
+
+{% block styles %}
+    {{ block.super }}
+    <link type="text/less" href="{% static 'news/css/post_list.less' %}" rel="stylesheet" />
+{% endblock %}
 
 {% block content %}
-
-    <div>
-        <a href="{% url 'news:post:add' %}">Dodaj post</a>
-    </div>
 
     <div class="error">
         {{ errors }}
     </div>
 
-    <ul>
-        {% for post in post_list %}
-            <li>
-                <ul>
-                    <li>{{ post.title }}</li>
-                    <li>{{ post.content }}</li>
-                    <li>{{ post.author }}</li>
-                    <li>{{ post.date_added }}</li>
-                </ul>
-            </li>
-            {% for elem in post.comments.all %}
-                {{ elem.content }}<br />
-                {{ elem.date_added }}<br />
-                {{ elem.author }}<br />
-            {% endfor %}
-            <form action="{% url 'news:comment:add' post_pk=post.pk %}" method="post">
-                {% csrf_token %}
-                {{ form }}
-                <input type="submit" value="Dodaj komentarz" />
-            </form>
+    {% for post in post_list %}
+        <div class="post-container">
+            <div class="post-title">
+                {{ post.title }}
+            </div>
+            <div class="post-author">
+                Autor: {{ post.author.first_name }} {{ post.author.last_name }}
+            </div>
+            <div class="post-date">
+                Dodano: {{ post.date_added }}
+            </div>
+            <div class="post-content">
+                <p>{{ post.content }}</p>
+            </div>
+            <div class="comments-container">
+                {% for elem in post.comments.all %}
+                    <div class="comment">
+                        <div class="comment-author">{{ elem.author }}</div>
+                        <div class="comment-content">{{ elem.content }}</div>
+                        <div class="comment-date">{{ elem.date_added}}</div>
+                    </div>
+                {% endfor %}
+                <div class="comment-form">
+                    <form action="{% url 'news:comment:add' post_pk=post.pk %}" method="post">
+                        {% csrf_token %}
+                        {{ form.content }}
+                        <div class="btn-container">
+                            <input class="btn btn-default" type="submit" value="Dodaj komentarz" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 
-        {% endfor %}
-    </ul>
 {% endblock %}

@@ -1,25 +1,56 @@
 {% load staticfiles compress %}
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>News | {{ site_title }}</title> {# TODO: Create context preprocessor and  add common var #}
+    <meta charset="UTF-8" >
+
+    <title>News | {{ site_title }}</title>
 
     {% compress css %}
-        <link type="text/less" href="{% static 'news/css/main.less' %}" rel="stylesheet"/>
+        {% block styles %}
+            <link type="text/less" href="{% static 'news/css/reset.less' %}" rel="stylesheet" />
+            <link type="text/less" href="{% static 'news/css/base.less' %}" rel="stylesheet" />
+            <link type="text/less" href="{% static 'news/lib/bootstrap-3.3.6/less/bootstrap.less' %}" rel="stylesheet" />
+        {% endblock %}
     {% endcompress %}
 
     {% compress js %}
+        {% block scripts %}
+        <script type="text/javascript" src="{% static 'news/lib/bootstrap-3.3.6/dist/js/bootstrap.js' %}" ></script>
+        {% endblock %}
     {% endcompress %}
 
     {% if DEBUG %}
         <script type="text/javascript" src="{% static "news/js/less.js-2.5.3/dist/less.min.js" %}"></script>
     {% endif %}
+
+    <!-- [if gte IE 9] -->
+    {% block fonts %}
+        <link href='{{ isivi_common.is_secure_request|yesno:'https,http' }}://fonts.googleapis.com/css?family=Open+Sans:300,400,600,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css' />
+    {% endblock fonts %}
+    <!-- [endif] -->
+
 </head>
 <body>
 
-{% block content %}
-{% endblock %}
+    <div id="the-very-top">
+        <div id="header">
+            {% block header %}
+                {% include 'global/base/header.html' %}
+            {% endblock %}
+        </div>
+
+        <div id="content-wrapper">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <div id="footer">
+            {% block footer %}
+            {% endblock %}
+        </div>
+    </div>
 
 </body>
 </html>
