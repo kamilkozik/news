@@ -1,14 +1,24 @@
 {% extends 'global/base/base.html' %}
+{% load staticfiles %}
+
+{% block styles %}
+    {{ block.super }}
+    <link type="text/less" href="{% static 'news/css/post_form.less' %}" rel="stylesheet" />
+{% endblock %}
 
 {% block content %}
     <div class="error">
         {{ errors }}
     </div>
 
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.title }}
-        {{ form.content }}
-        <input type="submit" value="Wyślij" />
-    </form>
+    <div class="form-container">
+        <form action="" method="post">
+            {% csrf_token %}
+            <label>{{ form.title.label }}</label>
+            {{ form.title }}
+            <label>{{ form.content.label }}</label>
+            {{ form.content }}
+            <input type="submit" class="btn btn-default" value="Wyślij" />
+        </form>
+    </div>
 {% endblock %}
