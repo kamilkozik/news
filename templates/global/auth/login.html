@@ -1,0 +1,19 @@
+{% extends 'global/base/base.html' %}
+{% load staticfiles %}
+
+{% block styles %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="error">
+        {{ errors }}
+    </div>
+    <form action="{% url 'auth:log_in' %}{% if redirect_url %}?redirect_url={{ redirect_url }}{% endif %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input class="btn btn-default" type="submit" value="Zaloguj"/>
+    </form>
+
+{% endblock %}

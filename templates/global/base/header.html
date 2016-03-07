@@ -5,6 +5,12 @@
             <ul class="nav navbar-nav">
                 <li><a href="{% url 'news:list' %}">Posty</a></li>
                 <li><a href="{% url 'news:post:add' %}">Nowy post</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'auth:log_out' %}">Wyloguj</a></li>
+                {% else %}
+                    <li><a href="{% url 'auth:show' %}">Zaloguj</a></li>
+                {% endif %}
+                <li><a href="{% url 'register:show' %}">Rejestracja</a></li>
             </ul>
         </nav>
     </div>

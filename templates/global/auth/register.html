@@ -1,0 +1,19 @@
+{% extends 'global/base/base.html' %}
+{% load staticfiles %}
+
+{% block styles %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="error">
+        {{ errors }}
+    </div>
+    <form action="{% url 'register:add' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input class="btn btn-default" type="submit" value="Rejestruj"/>
+    </form>
+
+{% endblock %}

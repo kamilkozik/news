@@ -133,3 +133,6 @@ COMPRESS_PRECOMPILERS = (
 )
 COMPRESS_OUTPUT_DIR = 'compressed'
 COMPRESS_ENABLED = False
+
+# AUTH settings
+LOGIN_URL = '/auth/log/'
