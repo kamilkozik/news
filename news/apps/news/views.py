@@ -1,7 +1,13 @@
 # -*- coding: utf8 -*-
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.db.models.query import Prefetch
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect, render
+from django.template import RequestContext
+from django.utils.decorators import method_decorator
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
@@ -9,6 +15,7 @@ from news.apps.news.forms import PostForm, CommentForm
 from news.apps.news.models import Post, Comment
 
 
+@method_decorator(login_required, name='dispatch')
 class PostList(ListView):
     model = Post
     context_object_name = 'post_list'
@@ -26,6 +33,7 @@ class PostList(ListView):
             filter(is_authorized=True)
 
 
+@method_decorator(login_required, name='dispatch')
 class PostCreate(CreateView):
     model = Post
     fields = ['title', 'content']
@@ -40,6 +48,7 @@ class PostCreate(CreateView):
         return super(PostCreate, self).form_valid(form)
 
 
+@method_decorator(login_required, name='dispatch')
 class CommentCreate(CreateView):
     model = Comment
     fields = ['content']
@@ -65,3 +74,43 @@ class CommentCreate(CreateView):
         form.instance.author = self.request.user
         form.instance.post = self.post_obj
         return super(CommentCreate, self).form_valid(form)
+
+
+def auth_view(request):
+    form = AuthenticationForm()
+    redirect_url = request.GET.get('next', None)
+    context = RequestContext(request,
+                             {'form': form,
+                              'redirect_url': redirect_url})
+    template = 'global/auth/login.html'
+    return render_to_response(template_name=template, context=context)
+
+
+def log_in(request):
+    context = {}
+    form = AuthenticationForm()
+    user = authenticate(
+        username=request.POST.get('username', None),
+        password=request.POST.get('password', None)
+    )
+
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            redirect_url = request.GET.get('redirect_url', False)
+            if redirect_url:
+                return redirect(redirect_url)
+            return redirect(reverse('news:list'))
+        else:
+            context['errors'] = 'Account not activated'
+            context['form'] = form
+            return render(request, 'global/auth/login.html', context=context)
+    else:
+        context['errors'] = 'Pass or login wrong'
+        context['form'] = form
+        return render(request, 'global/auth/login.html', context=context)
+
+
+def log_out(request):
+    logout(request)
+    return redirect(reverse('auth_view'))
