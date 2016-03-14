@@ -1,0 +1,56 @@
+#content-wrapper .post-container {
+  width: 700px;
+  box-shadow: 0px 0px 5px #808080;
+  padding: 25px;
+  margin-bottom: 35px;
+}
+#content-wrapper .post-container .post-title {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+#content-wrapper .post-container .post-author {
+  display: block;
+  font-size: 11px;
+  color: #808080;
+}
+#content-wrapper .post-container .post-date {
+  display: block;
+  font-size: 11px;
+  color: #808080;
+}
+#content-wrapper .post-container .post-content {
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.22);
+  text-align: justify;
+}
+#content-wrapper .post-container .comments-container .comment {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+#content-wrapper .post-container .comments-container .comment .comment-author {
+  display: block;
+  font-size: 11px;
+  color: #808080;
+}
+#content-wrapper .post-container .comments-container .comment .comment-content {
+  font-size: 12px;
+  text-align: justify;
+}
+#content-wrapper .post-container .comments-container .comment .comment-date {
+  display: block;
+  font-size: 11px;
+  color: #808080;
+  text-align: right;
+}
+#content-wrapper .post-container .comments-container .comment-form textarea {
+  display: block;
+  width: 650px;
+  max-width: 650px;
+  height: 100px;
+  margin-bottom: 15px;
+}
+#content-wrapper .post-container .comments-container .comment-form .btn-container {
+  text-align: right;
+}
