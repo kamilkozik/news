@@ -1,7 +1,8 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals
 
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
@@ -15,9 +16,10 @@ class Post(models.Model):
     is_authorized = models.BooleanField(default=False)
     is_commentable = models.BooleanField(default=True)
     slug = models.SlugField()
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     class Meta:
+        app_label = 'news'
         verbose_name = u"Post"
         verbose_name_plural = u"Posty"
 
@@ -43,9 +45,10 @@ class Comment(models.Model):
     date_modified = models.DateField(blank=True, null=True)
     is_authorized = models.BooleanField(default=False)
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     class Meta:
+        app_label = 'news'
         verbose_name = u"Komentarz"
         verbose_name_plural = u"Komentarze"
 
