@@ -41,6 +41,18 @@
             {% endblock %}
         </div>
 
+        {% if request.session.bad_login and request.user.is_authenticated %}
+        <div>
+            You have tried to log in {{ request.session.bad_login }} times!
+        </div>
+        {% endif %}
+
+        {% if request.session.bad_login >= 3 and request.user.is_anonymous %}
+        <div>
+            You have entered wrong credentials {{ request.session.bad_login }} times.
+        </div>
+        {% endif %}
+
         <div id="content-wrapper">
             {% block content %}
             {% endblock %}

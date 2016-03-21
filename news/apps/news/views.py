@@ -9,7 +9,6 @@ from django.db.models.query import Prefetch
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
-from django.utils.dateformat import format
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -36,8 +35,6 @@ class PostList(ListView):
             filter(is_authorized=True)
 
     def dispatch(self, request, *args, **kwargs):
-        for key, value in request.session.items():
-            print "Session key-value pairs: " + key, value
         return super(PostList, self).dispatch(request, *args, **kwargs)
 
 
@@ -105,28 +102,28 @@ def log_in(request):
     if user is not None:
         if user.is_active:
             login(request, user)
-            timestamp = format(datetime.now(), u'U')
-            last_visited = request.session['last_visited'] = timestamp
             redirect_url = request.GET.get('redirect_url', False)
             if redirect_url:
-                response = HttpResponseRedirect(redirect_url)
-                response.set_cookie('last_visited', last_visited)
-                return response
-            response = HttpResponseRedirect(reverse('news:list'))
-            response.set_cookie('last_visited', last_visited)
-            return response
+                return HttpResponseRedirect(redirect_url)
+            return HttpResponseRedirect(reverse('news:list'))
         else:
             context['errors'] = 'Account not activated'
             context['form'] = form
-            response = HttpResponseRedirect(reverse('auth:log_in'))
+            print request.session.get('inactive_user_login_count', False)
+            if request.session.get('inactive_user_login_count', False):
+                request.session['inactive_user_login_count'] += 1
+            else:
+                request.session['inactive_user_login_count'] = 1
+            print [(key, value) for key, value in request.session.items()]
             return render(request, 'global/auth/login.html', context=context)
     else:
         if request.session.get('bad_login', False):
-            request.session['bad_login'] = int(request.session['bad_login']) + 1
+            request.session['bad_login'] += 1
         else:
             request.session['bad_login'] = 1
         context['errors'] = 'Pass or login wrong'
         context['form'] = form
+        print request.session['bad_login']
         return render(request, 'global/auth/login.html', context=context)
 
 
