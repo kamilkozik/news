@@ -1,12 +1,15 @@
 # -*- coding: utf8 -*-
+from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models.query import Prefetch
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
+from django.utils.dateformat import format
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -31,6 +34,11 @@ class PostList(ListView):
         return super(PostList, self).get_queryset().prefetch_related(
             Prefetch('comments', queryset=Comment.objects.filter(is_authorized=True))).\
             filter(is_authorized=True)
+
+    def dispatch(self, request, *args, **kwargs):
+        for key, value in request.session.items():
+            print "Session key-value pairs: " + key, value
+        return super(PostList, self).dispatch(request, *args, **kwargs)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -97,15 +105,26 @@ def log_in(request):
     if user is not None:
         if user.is_active:
             login(request, user)
+            timestamp = format(datetime.now(), u'U')
+            last_visited = request.session['last_visited'] = timestamp
             redirect_url = request.GET.get('redirect_url', False)
             if redirect_url:
-                return redirect(redirect_url)
-            return redirect(reverse('news:list'))
+                response = HttpResponseRedirect(redirect_url)
+                response.set_cookie('last_visited', last_visited)
+                return response
+            response = HttpResponseRedirect(reverse('news:list'))
+            response.set_cookie('last_visited', last_visited)
+            return response
         else:
             context['errors'] = 'Account not activated'
             context['form'] = form
+            response = HttpResponseRedirect(reverse('auth:log_in'))
             return render(request, 'global/auth/login.html', context=context)
     else:
+        if request.session.get('bad_login', False):
+            request.session['bad_login'] = int(request.session['bad_login']) + 1
+        else:
+            request.session['bad_login'] = 1
         context['errors'] = 'Pass or login wrong'
         context['form'] = form
         return render(request, 'global/auth/login.html', context=context)
@@ -122,6 +141,18 @@ def register_view(request):
     context.push({'form': form})
     template = 'global/auth/register.html'
     return render(request, template_name=template, context=context)
+
+
+@login_required
+def flush_session_values(request):
+    for key, value in request.session.items():
+        print key, value
+
+    print '----------------------------'
+    request.session.clear()
+    for key, value in request.session.items():
+        print key, value
+    return HttpResponse('Session\'s clean method used')
 
 
 def register(request):

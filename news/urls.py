@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.views.generic.base import RedirectView
 from django.conf import settings
 
-from news.apps.news.views import auth_view, log_in, log_out, register, register_view
+from news.apps.news.views import auth_view, log_in, log_out, flush_session_values, register, register_view
 
 urlpatterns = [
     # Admin
@@ -30,6 +30,8 @@ urlpatterns = [
             url(r'^add/$', register, name='add')
         ], namespace='register'))
     ])),
+
+    url(r'^flush_session/$', flush_session_values, name='flush_session'),
 ]
 
 if settings.DEBUG:
