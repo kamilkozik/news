@@ -9,11 +9,12 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import CreateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from news.apps.news.forms import PostForm, CommentForm, UserForm
 from news.apps.news.models import Post, Comment
+
 
 # # # # # # # # # # # #
 # Post related views
@@ -26,22 +27,31 @@ class PostList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PostList, self).get_context_data()
-        context['site_title'] = 'List of posts'
-        context['form'] = self.form
+
+        if context.get('post_list', False):
+            posts_form_obj_list = []
+            posts = context.get('post_list', None)
+            for post in posts:
+                posts_form_obj_list.append(
+                    {
+                        'post': post,
+                        'form_post': PostForm(initial={'title': post.title, 'content': post.content})
+                    }
+                )
+
+            context.update(
+                {'site_title': 'List of posts', 'form': self.form, 'post_list': posts_form_obj_list}
+            )
         return context
 
     def get_queryset(self):
         user = self.request.user
         if user.is_staff:
-            return super(PostList, self).get_queryset().prefetch_related(
-                Prefetch('comments', queryset=Comment.objects.all())
-            )
-        return super(PostList, self).get_queryset().prefetch_related(
-            Prefetch('comments', queryset=Comment.objects.filter(is_publicated=True))
-        ).filter(is_publicated=True)
-
-    def dispatch(self, request, *args, **kwargs):
-        return super(PostList, self).dispatch(request, *args, **kwargs)
+            return super(PostList, self).get_queryset().\
+                prefetch_related(Prefetch('comments', queryset=Comment.objects.all()))
+        return super(PostList, self).get_queryset().\
+            prefetch_related(Prefetch('comments', queryset=Comment.objects.filter(is_publicated=True))).\
+            filter(is_publicated=True)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -63,6 +73,23 @@ class PostCreate(CreateView):
 class PostDelete(DeleteView):
     model = Post
     success_url = reverse_lazy('news:list')
+
+
+def post_update(request, pk):
+    user = request.user
+    form = PostForm(request.POST)
+    if form.is_valid():
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist():
+            return HttpResponseBadRequest()
+
+        if post.author == user:
+            post.title = form.cleaned_data['title']
+            post.content = form.cleaned_data['content']
+            post.save()
+            return HttpResponseRedirect(reverse('news:list'))
+    return HttpResponseBadRequest()
 
 
 def post_publish(request, post_pk):

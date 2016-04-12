@@ -12,32 +12,43 @@
         {{ errors }}
     </div>
 
-    {% for post in post_list %}
+    {% for obj in post_list %}
         <div class="post-container">
             {% if user.is_staff %}
-                {% if not post.is_publicated %}
+                {% if not obj.post.is_publicated %}
                     <div class="authorize">
-                        <a href="{% url 'news:post:publish' post_pk=post.pk %}">Publikuj</a>
+                        <a href="{% url 'news:post:publish' post_pk=obj.post.pk %}">Publikuj</a>
                     </div>
                 {% endif %}
                 <div class="delete">
-                    <a href="{% url "news:post:delete" pk=post.pk %}">Usuń</a>
+                    <a href="{% url "news:post:delete" pk=obj.post.pk %}">Usuń</a>
                 </div>
             {% endif %}
             <div class="post-title">
-                {{ post.title }}
+                {{ obj.post.title }}
             </div>
             <div class="post-author">
-                Autor: {{ post.author.first_name }} {{ post.author.last_name }} ({{ post.author.username }})
+                Autor: {{ obj.post.author.first_name }} {{ obj.post.author.last_name }} ({{ obj.post.author.username }})
             </div>
             <div class="post-date">
-                Dodano: {{ post.date_added }}
+                Dodano: {{ obj.post.date_added }}
             </div>
             <div class="post-content">
-                <p>{{ post.content }}</p>
+                <p>{{ obj.post.content }}</p>
+                {% if obj.post.author == user %}
+                    <div class="post-update">
+                        <form action="{% url 'news:post:update' pk=obj.post.pk %}" method="post">
+                            {% csrf_token %}
+                            {{ obj.form_post.as_p }}
+                            <div class="btn-container">
+                                <input class="btn btn-default" type="submit" value="Zapisz" />
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
             <div class="comments-container">
-                {% for comment in post.comments.all %}
+                {% for comment in obj.post.comments.all %}
                     {% if comment.is_publicated %}
                         <div class="comment">
                             {% if user.is_staff %}
@@ -65,7 +76,7 @@
                     {% endif %}
                 {% endfor %}
                 <div class="comment-form">
-                    <form action="{% url 'news:comment:add' post_pk=post.pk %}" method="post">
+                    <form action="{% url 'news:comment:add' post_pk=obj.post.pk %}" method="post">
                         {% csrf_token %}
                         {{ form.content }}
                         <div class="btn-container">
