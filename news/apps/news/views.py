@@ -2,6 +2,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models.query import Prefetch
@@ -19,6 +20,8 @@ from news.apps.news.models import Post, Comment
 
 # # # # # # # # # # # #
 # Post related views
+from news.apps.person.models import Person
+
 
 @method_decorator(login_required, name='dispatch')
 class PostList(ListView):
@@ -82,7 +85,7 @@ def post_update(request, pk):
     if form.is_valid():
         try:
             post = Post.objects.get(pk=pk)
-        except Post.DoesNotExist():
+        except Post.DoesNotExist:
             return HttpResponseBadRequest()
 
         if post.author == user:
@@ -99,7 +102,7 @@ def post_publish(request, post_pk):
         return HttpResponseBadRequest()
     try:
         post = Post.objects.get(pk=post_pk)
-    except Post.DoesNotExist():
+    except Post.DoesNotExist:
         return HttpResponseBadRequest()
     post.publish_post()
     post.save()
@@ -149,7 +152,7 @@ def comment_publish(request, comment_pk):
         return HttpResponseBadRequest()
     try:
         comment = Comment.objects.get(pk=comment_pk)
-    except Comment.DoesNotExist():
+    except Comment.DoesNotExist:
         return HttpResponseBadRequest()
     comment.publish_comment()
     comment.save()
@@ -223,10 +226,18 @@ def register(request):
     if form.is_valid():
         try:
             form.clean_password2()
-        except forms.ValidationError():
+        except forms.ValidationError:
             form = UserCreationForm()
             return render(request, 'global/auth/register.html', context={'form': form})
-        form.save(commit=True)
+        form.save()
+        try:
+            user = User.objects.get(username=form.cleaned_data.get('username'))
+        except User.DoesNotExist:
+            return render(request, 'global/auth/register.html', context={'form': form})
+
+        if user:
+            person = Person(user=user)
+            person.save()
         return redirect('auth:show')
     form = UserCreationForm()
     return render(request, 'global/auth/register.html', context={'form': form})
