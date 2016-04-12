@@ -10,8 +10,13 @@
                 {% else %}
                     <li><a href="{% url 'auth:show' %}">Zaloguj</a></li>
                 {% endif %}
-                <li><a href="{% url 'register:show' %}">Rejestracja</a></li>
+{#                <li><a href="{% url 'register:show' %}">Rejestracja</a></li>#}
             </ul>
         </nav>
+        {% if user.is_authenticated %}
+            <ul class="nav navbar-nav navbar-right">
+                <li>Cześć {{ user.username }}</li>
+            </ul>
+        {% endif %}
     </div>
 </div>

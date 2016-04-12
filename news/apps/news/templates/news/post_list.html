@@ -14,11 +14,16 @@
 
     {% for post in post_list %}
         <div class="post-container">
+            {% if user.is_staff and not post.is_publicated %}
+                <div class="authorize">
+                    <a href="{% url 'news:post:publish' post_pk=post.pk %}">Publikuj</a>
+                </div>
+            {% endif %}
             <div class="post-title">
                 {{ post.title }}
             </div>
             <div class="post-author">
-                Autor: {{ post.author.first_name }} {{ post.author.last_name }}
+                Autor: {{ post.author.first_name }} {{ post.author.last_name }} ({{ post.author.username }})
             </div>
             <div class="post-date">
                 Dodano: {{ post.date_added }}
@@ -27,12 +32,26 @@
                 <p>{{ post.content }}</p>
             </div>
             <div class="comments-container">
-                {% for elem in post.comments.all %}
-                    <div class="comment">
-                        <div class="comment-author">{{ elem.author }}</div>
-                        <div class="comment-content">{{ elem.content }}</div>
-                        <div class="comment-date">{{ elem.date_added}}</div>
-                    </div>
+                {% for comment in post.comments.all %}
+                    {% if comment.is_publicated %}
+                        <div class="comment">
+                            <div class="comment-author">{{ comment.author }}</div>
+                            <div class="comment-content">{{ comment.content }}</div>
+                            <div class="comment-date">{{ comment.date_added}}</div>
+                        </div>
+                        
+                    {% elif not comment.is_publicated and user.is_staff %}
+                        <div class="comment">
+                            <div class="publish">
+                                <a href="{% url 'news:comment:publish' comment_pk=comment.pk %}">
+                                    Publikuj
+                                </a>
+                            </div>
+                            <div class="comment-author">{{ comment.author }}</div>
+                            <div class="comment-content">{{ comment.content }}</div>
+                            <div class="comment-date">{{ comment.date_added}}</div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
                 <div class="comment-form">
                     <form action="{% url 'news:comment:add' post_pk=post.pk %}" method="post">

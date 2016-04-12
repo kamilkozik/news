@@ -1,12 +1,11 @@
 # -*- coding: utf8 -*-
-from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models.query import Prefetch
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
 from django.utils.decorators import method_decorator
@@ -30,9 +29,13 @@ class PostList(ListView):
         return context
 
     def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return super(PostList, self).get_queryset().prefetch_related(
+                Prefetch('comments', queryset=Comment.objects.all()))
         return super(PostList, self).get_queryset().prefetch_related(
-            Prefetch('comments', queryset=Comment.objects.filter(is_authorized=True))).\
-            filter(is_authorized=True)
+            Prefetch('comments', queryset=Comment.objects.filter(is_publicated=True))). \
+            filter(is_publicated=True)
 
     def dispatch(self, request, *args, **kwargs):
         return super(PostList, self).dispatch(request, *args, **kwargs)
@@ -140,6 +143,37 @@ def register_view(request):
     return render(request, template_name=template, context=context)
 
 
+def post_publish(request, post_pk):
+    user = request.user
+    if not user.is_staff:
+        return HttpResponseBadRequest()
+    try:
+        post = Post.objects.get(pk=post_pk)
+    except Post.DoesNotExist():
+        return HttpResponseBadRequest()
+    post.publish_post()
+    post.save()
+    return HttpResponseRedirect(reverse('news:list'))
+
+
+def comment_publish(request, comment_pk):
+    user = request.user
+    if not user.is_staff:
+        return HttpResponseBadRequest()
+    try:
+        comment = Comment.objects.get(pk=comment_pk)
+    except Comment.DoesNotExist():
+        return HttpResponseBadRequest()
+    comment.publish_comment()
+    comment.save()
+    return HttpResponseRedirect(reverse('news:list'))
+
+
+def register(request):
+    # todo: register view to be developed
+    pass
+
+
 @login_required
 def flush_session_values(request):
     for key, value in request.session.items():
@@ -150,7 +184,3 @@ def flush_session_values(request):
     for key, value in request.session.items():
         print key, value
     return HttpResponse('Session\'s clean method used')
-
-
-def register(request):
-    pass

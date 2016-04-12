@@ -2,15 +2,17 @@
 
 from django.conf.urls import url, include
 
-from news.apps.news.views import PostList, PostCreate, CommentCreate
+from news.apps.news.views import PostList, PostCreate, CommentCreate, post_publish, comment_publish
 
 urlpatterns = [
     url(r'^$', PostList.as_view(), name='list'),
     url(r'^post/', include([
         url(r'^add/$', PostCreate.as_view(), name='add'),
+        url(r'^publish/(?P<post_pk>\d+)$', post_publish, name='publish'),
     ], namespace='post')),
 
     url(r'^comment/', include([
         url(r'^add/(?P<post_pk>\d+)/$', CommentCreate.as_view(), name='add'),
+        url(r'^publish/(?P<comment_pk>\d+)/$', comment_publish, name='publish')
     ], namespace='comment'))
 ]
