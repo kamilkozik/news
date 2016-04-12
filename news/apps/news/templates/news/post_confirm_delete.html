@@ -1,0 +1,19 @@
+{% extends 'global/base/base.html' %}
+{% load staticfiles %}
+
+{% block styles %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="error">
+        {{ errors }}
+    </div>
+
+    <form action="" method="post">{% csrf_token %}
+        <p>Are you sure you want to delete "{{ object }}"?</p>
+        <input type="submit" value="Confirm" />
+    </form>
+
+{% endblock %}

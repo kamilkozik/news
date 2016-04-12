@@ -14,9 +14,14 @@
 
     {% for post in post_list %}
         <div class="post-container">
-            {% if user.is_staff and not post.is_publicated %}
-                <div class="authorize">
-                    <a href="{% url 'news:post:publish' post_pk=post.pk %}">Publikuj</a>
+            {% if user.is_staff %}
+                {% if not post.is_publicated %}
+                    <div class="authorize">
+                        <a href="{% url 'news:post:publish' post_pk=post.pk %}">Publikuj</a>
+                    </div>
+                {% endif %}
+                <div class="delete">
+                    <a href="{% url "news:post:delete" pk=post.pk %}">Usuń</a>
                 </div>
             {% endif %}
             <div class="post-title">
@@ -35,17 +40,23 @@
                 {% for comment in post.comments.all %}
                     {% if comment.is_publicated %}
                         <div class="comment">
+                            {% if user.is_staff %}
+                                <div class="delete">
+                                    <a href="{% url "news:comment:delete" pk=comment.pk %}">Usuń</a>
+                                </div>
+                            {% endif %}
                             <div class="comment-author">{{ comment.author }}</div>
                             <div class="comment-content">{{ comment.content }}</div>
                             <div class="comment-date">{{ comment.date_added}}</div>
                         </div>
                         
-                    {% elif not comment.is_publicated and user.is_staff %}
+                    {% elif user.is_staff %}
                         <div class="comment">
                             <div class="publish">
-                                <a href="{% url 'news:comment:publish' comment_pk=comment.pk %}">
-                                    Publikuj
-                                </a>
+                                <a href="{% url 'news:comment:publish' comment_pk=comment.pk %}">Publikuj</a>
+                            </div>
+                            <div class="delete">
+                                <a href="{% url "news:comment:delete" pk=comment.pk %}">Usuń</a>
                             </div>
                             <div class="comment-author">{{ comment.author }}</div>
                             <div class="comment-content">{{ comment.content }}</div>

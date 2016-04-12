@@ -3,18 +3,20 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models.query import Prefetch
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.list import ListView
 
 from news.apps.news.forms import PostForm, CommentForm, UserForm
 from news.apps.news.models import Post, Comment
 
+# # # # # # # # # # # #
+# Post related views
 
 @method_decorator(login_required, name='dispatch')
 class PostList(ListView):
@@ -32,10 +34,11 @@ class PostList(ListView):
         user = self.request.user
         if user.is_staff:
             return super(PostList, self).get_queryset().prefetch_related(
-                Prefetch('comments', queryset=Comment.objects.all()))
+                Prefetch('comments', queryset=Comment.objects.all())
+            )
         return super(PostList, self).get_queryset().prefetch_related(
-            Prefetch('comments', queryset=Comment.objects.filter(is_publicated=True))). \
-            filter(is_publicated=True)
+            Prefetch('comments', queryset=Comment.objects.filter(is_publicated=True))
+        ).filter(is_publicated=True)
 
     def dispatch(self, request, *args, **kwargs):
         return super(PostList, self).dispatch(request, *args, **kwargs)
@@ -55,6 +58,28 @@ class PostCreate(CreateView):
         form.instance.author = self.request.user
         return super(PostCreate, self).form_valid(form)
 
+
+@method_decorator(login_required, name='dispatch')
+class PostDelete(DeleteView):
+    model = Post
+    success_url = reverse_lazy('news:list')
+
+
+def post_publish(request, post_pk):
+    user = request.user
+    if not user.is_staff:
+        return HttpResponseBadRequest()
+    try:
+        post = Post.objects.get(pk=post_pk)
+    except Post.DoesNotExist():
+        return HttpResponseBadRequest()
+    post.publish_post()
+    post.save()
+    return HttpResponseRedirect(reverse('news:list'))
+
+
+# # # # # # # # # # # #
+# Comment related views
 
 @method_decorator(login_required, name='dispatch')
 class CommentCreate(CreateView):
@@ -83,6 +108,28 @@ class CommentCreate(CreateView):
         form.instance.post = self.post_obj
         return super(CommentCreate, self).form_valid(form)
 
+
+@method_decorator(login_required, name='dispatch')
+class CommentDelete(DeleteView):
+    model = Comment
+    success_url = reverse_lazy('news:list')
+
+
+def comment_publish(request, comment_pk):
+    user = request.user
+    if not user.is_staff:
+        return HttpResponseBadRequest()
+    try:
+        comment = Comment.objects.get(pk=comment_pk)
+    except Comment.DoesNotExist():
+        return HttpResponseBadRequest()
+    comment.publish_comment()
+    comment.save()
+    return HttpResponseRedirect(reverse('news:list'))
+
+
+# # # # # # # # # # # #
+# Auth related views
 
 def auth_view(request):
     form = AuthenticationForm()
@@ -143,36 +190,13 @@ def register_view(request):
     return render(request, template_name=template, context=context)
 
 
-def post_publish(request, post_pk):
-    user = request.user
-    if not user.is_staff:
-        return HttpResponseBadRequest()
-    try:
-        post = Post.objects.get(pk=post_pk)
-    except Post.DoesNotExist():
-        return HttpResponseBadRequest()
-    post.publish_post()
-    post.save()
-    return HttpResponseRedirect(reverse('news:list'))
-
-
-def comment_publish(request, comment_pk):
-    user = request.user
-    if not user.is_staff:
-        return HttpResponseBadRequest()
-    try:
-        comment = Comment.objects.get(pk=comment_pk)
-    except Comment.DoesNotExist():
-        return HttpResponseBadRequest()
-    comment.publish_comment()
-    comment.save()
-    return HttpResponseRedirect(reverse('news:list'))
-
-
 def register(request):
     # todo: register view to be developed
     pass
 
+
+# # # # # # # # # # # #
+# Session related views
 
 @login_required
 def flush_session_values(request):
