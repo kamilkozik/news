@@ -12,7 +12,7 @@
     </div>
     <form action="{% url 'register:add' %}" method="post">
         {% csrf_token %}
-        {{ form }}
+        {{ form.as_p }}
         <input class="btn btn-default" type="submit" value="Rejestruj"/>
     </form>
 

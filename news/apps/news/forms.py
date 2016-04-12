@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import ModelForm, TextInput, Textarea
 
@@ -6,7 +7,6 @@ from news.apps.news.models import Post, Comment
 
 
 class PostForm(ModelForm):
-
     class Meta:
         model = Post
         fields = ('title', 'content')
@@ -17,18 +17,12 @@ class PostForm(ModelForm):
 
 
 class CommentForm(ModelForm):
-
     class Meta:
         model = Comment
         fields = ('content',)
 
 
-class UserForm(ModelForm):
-    password = forms.PasswordInput(render_value=False)
-
+class UserForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password')
-        widgets = {
-            'password': forms.PasswordInput()
-        }
+        fields = ('username',)

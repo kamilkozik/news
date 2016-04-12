@@ -1,10 +1,11 @@
 # -*- coding: utf8 -*-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models.query import Prefetch
+from django.forms import forms
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, redirect, render
 from django.template import RequestContext
@@ -218,8 +219,18 @@ def register_view(request):
 
 
 def register(request):
-    # todo: register view to be developed
-    pass
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+        try:
+            form.clean_password2()
+        except forms.ValidationError():
+            form = UserCreationForm()
+            return render(request, 'global/auth/register.html', context={'form': form})
+        form.save(commit=True)
+        return redirect('auth:show')
+    form = UserCreationForm()
+    return render(request, 'global/auth/register.html', context={'form': form})
+
 
 
 # # # # # # # # # # # #
