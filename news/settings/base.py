@@ -22,7 +22,14 @@ BASE_DIR = dirname(dirname(dirname(abspath(__file__))))
 # SECURITY WARNING: keep the secret key used in production secret!
 # TODO: implement some clever way for hiding secret key
 SECRET_KEY = '9c=o+i!2q4912m9ycpw2&!mzw6y#f-q&df)ty2z#66uj=!cp^='
-
+SOCIAL_AUTH_FACEBOOK_KEY = open(join(dirname(dirname(BASE_DIR)), 'dev/secret/key')).read()
+SOCIAL_AUTH_FACEBOOK_SECRET = open(join(dirname(dirname(BASE_DIR)), 'dev/secret/secret')).read()
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/news/'
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'locale': 'pl_pl',
+    'fields': 'id, name, email, age_range',
+}
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -45,6 +52,9 @@ INSTALLED_APPS = [
     'news.apps.news',
     'news.apps.person',
 
+    # social authentication
+    'social.apps.django_app.default'
+
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -56,6 +66,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social.apps.django_app.middleware.SocialAuthExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'news.urls'
@@ -72,6 +83,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'news.context_processors.base',
+                'social.apps.django_app.context_processors.backends',
+                'social.apps.django_app.context_processors.login_redirect'
             ],
         },
     },
@@ -98,6 +111,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'social.backends.facebook.FacebookOAuth2',
+    'social.backends.google.GoogleOAuth2',
+    'social.backends.twitter.TwitterOAuth',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/

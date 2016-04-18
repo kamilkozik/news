@@ -28,7 +28,10 @@ urlpatterns = [
         url(r'^register/', include([
             url(r'^$', register_view, name='show'),
             url(r'^add/$', register, name='add')
-        ], namespace='register'))
+        ], namespace='register')),
+
+        # Social auth
+        url('', include('social.apps.django_app.urls', namespace='social'))
     ])),
 
     url(r'^flush_session/$', flush_session_values, name='flush_session'),
