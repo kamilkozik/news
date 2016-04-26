@@ -9,3 +9,8 @@ SKIN_COLORS = (
     (PINK, 'Pink'),
     (BLUE, 'Blue'),
 )
+
+IMAGE_SIZES = {
+    'THUMBNAIL': (128, 128),
+    'BANNER': (550, 275)
+}

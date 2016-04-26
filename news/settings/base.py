@@ -138,6 +138,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = join(BASE_DIR, 'public', 'static')
 
+# Users Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = join(BASE_DIR, 'private', 'media')
+
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
