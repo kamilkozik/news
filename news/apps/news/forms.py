@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import ModelForm, TextInput, Textarea
@@ -22,6 +21,7 @@ class CommentForm(ModelForm):
         fields = ('content',)
 
 
+# TODO(KK): Should be moved to person model directory
 class UserForm(UserCreationForm):
     class Meta:
         model = User

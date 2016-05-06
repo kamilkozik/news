@@ -1,16 +1,20 @@
 # -*- coding: utf8 -*-
 
+from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import RedirectView
-from django.conf import settings
 
-from news.apps.news.views import auth_view, log_in, log_out, flush_session_values, register, register_view
+from news.apps.news.views import auth_view, log_in, log_out, flush_session_values,\
+    register, register_view
 
 urlpatterns = [
     # Admin
     url(r'^admin/', admin.site.urls),
+
+    # Person
+    url(r'^person/', include('news.apps.person.urls', namespace='person')),
 
     # News
     url(r'^$', RedirectView.as_view(pattern_name='news:list')),

@@ -1,0 +1,22 @@
+{% extends 'global/base/base.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+
+{% block content %}
+    {{ person.skin_color }} <br />
+    {% for image_obj in person.person_image.all %}
+        {{ image_obj.image }}<br/>
+        {% thumbnail image_obj.image "120x120" crop="center" as im %}
+        <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"/>
+        {% endthumbnail %}
+    {% endfor %}
+    <br />
+    {{ person.user.username }} <br />
+    <br />
+    <br />
+    <form action="{% url 'person:profile:image:add' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ image_form.as_p }}
+        <button type="submit">Zapisz</button>
+    </form>
+{% endblock content %}

@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     'news.apps.person',
 
     # social authentication
-    'social.apps.django_app.default'
+    'social.apps.django_app.default',
+
+    'sorl.thumbnail'
 
 ]
 
@@ -138,15 +140,19 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = join(BASE_DIR, 'public', 'static')
 
-# Users Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = join(BASE_DIR, 'private', 'media')
-
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # other finders..
     'compressor.finders.CompressorFinder',
+]
+
+# Users Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = join(BASE_DIR, 'private', 'media')
+
+STATICFILES_DIRS = [
+    MEDIA_ROOT
 ]
 
 # DJANGO_PRECOMPILERS settings

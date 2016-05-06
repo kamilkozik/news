@@ -17,7 +17,7 @@ class Person(models.Model):
 
 class PersonImage(models.Model):
     name = models.CharField(max_length=50, blank=False, null=False)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='person_thumbnail')
     person = models.ForeignKey(Person, related_name='person_image')
 
     class Meta:
