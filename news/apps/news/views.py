@@ -190,27 +190,26 @@ def log_in(request):
         else:
             context['errors'] = 'Account not activated'
             context['form'] = form
-            print request.session.get('inactive_user_login_count', False)
-            if request.session.get('inactive_user_login_count', False):
+            if hasattr(request.session, 'inactive_user_login_count'):
                 request.session['inactive_user_login_count'] += 1
             else:
                 request.session['inactive_user_login_count'] = 1
-            print [(key, value) for key, value in request.session.items()]
             return render(request, 'global/auth/login.html', context=context)
     else:
-        if request.session.get('bad_login', False):
+        if hasattr(request.session, 'bad_login'):
             request.session['bad_login'] += 1
         else:
             request.session['bad_login'] = 1
         context['errors'] = 'Pass or login wrong'
         context['form'] = form
-        print request.session['bad_login']
         return render(request, 'global/auth/login.html', context=context)
 
 
 def log_out(request):
+    print getattr(request, 'user')
     logout(request)
-    return redirect(reverse('auth:show'))
+    print getattr(request, 'user')
+    return redirect(reverse('news:list'))
 
 
 def register_view(request):
@@ -251,9 +250,5 @@ def register(request):
 def flush_session_values(request):
     for key, value in request.session.items():
         print key, value
-
-    print '----------------------------'
     request.session.clear()
-    for key, value in request.session.items():
-        print key, value
     return HttpResponse('Session\'s clean method used')
