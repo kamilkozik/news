@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.db import models
+from sorl import thumbnail
 
 from news.apps.person import consts
 
@@ -17,7 +18,7 @@ class Person(models.Model):
 
 class PersonImage(models.Model):
     name = models.CharField(max_length=50, blank=False, null=False)
-    image = models.ImageField(upload_to='person_thumbnail')
+    image = thumbnail.ImageField(upload_to='person_thumbnail')
     person = models.ForeignKey(Person, related_name='person_image')
 
     class Meta:
@@ -27,7 +28,3 @@ class PersonImage(models.Model):
         if not name:
             raise
         self.name = name
-
-    def crop_thumbnail(self):
-        image_resolution = consts.IMAGE_SIZES['THUMBNAIL']
-        self.image.thumbnail(image_resolution)
