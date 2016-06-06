@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     # social authentication
     'social.apps.django_app.default',
 
-    'sorl.thumbnail'
+    'sorl.thumbnail',
+    'sortedm2m'
 
 ]
 
