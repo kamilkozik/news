@@ -7,16 +7,31 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 
+import consts
+
 
 class Post(models.Model):
+    DRAFT = 1
+    OPEN = 2
+    ARCHIVED = 3
+
+    STATUS_CHOICES = (
+        (DRAFT, u'Robocza',),
+        (OPEN, u'Otwarta',),
+        (ARCHIVED, u'Archiwalna',),
+    )
+
     title = models.CharField(null=False, blank=False, max_length=500)
     content = models.TextField(null=False, blank=False)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    category = models.IntegerField(choices=consts.CATEGORIES_CHOICES, default=consts.OTHER)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=DRAFT)
+
     date_added = models.DateField(auto_now=True)
     date_modified = models.DateField(blank=True, null=True)
     is_publicated = models.BooleanField(default=False)
     is_commentable = models.BooleanField(default=True)
     slug = models.SlugField()
-    author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     class Meta:
         app_label = 'news'
