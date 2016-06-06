@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # news apps
     'news.apps.news',
     'news.apps.person',
+    'news.apps.common',
 
     # social authentication
     'social.apps.django_app.default',
