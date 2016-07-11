@@ -43,10 +43,14 @@ class Photo(ImageModel):
     slug = models.SlugField(u'slug', unique=True, max_length=250)
     is_public = models.BooleanField(u'czy publiczny?', default=True)
 
+    homepage = models.BooleanField(u'Czy na stronie domowej?', default=False)
+
     class Meta:
         app_label = 'news'
         ordering = ['-date_added']
         get_latest_by = 'date_added'
+        verbose_name = u'Zdjęcie'
+        verbose_name_plural = u'Zdjęcia'
 
     def __str__(self):
         return self.title
@@ -57,6 +61,16 @@ class Photo(ImageModel):
 
         # Check if created slug already exists. Handle duplicates
         super(Photo, self).save(*args, **kwargs)
+
+    @classmethod
+    def set_as_homepage(cls, obj, commit=False):
+        all_obj = cls.objects.filter(homepage=True)
+        if all_obj:
+            all_obj.update(homepage=False)
+        obj.homepage = True
+        if commit:
+            obj.save()
+        return obj
 
 
 class Gallery(models.Model):
@@ -76,6 +90,8 @@ class Gallery(models.Model):
         app_label = 'news'
         ordering = ['-date_added']
         get_latest_by = 'date_added'
+        verbose_name = u'Galeria zdjęć'
+        verbose_name_plural = u'Galerie zdjęć'
 
     def __str__(self):
         return self.title

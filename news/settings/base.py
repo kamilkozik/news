@@ -1,6 +1,5 @@
 
 from os.path import dirname, abspath, join
-from .celery_base import *
 
 
 BASE_DIR = dirname(dirname(dirname(abspath(__file__))))

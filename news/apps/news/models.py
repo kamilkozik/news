@@ -8,6 +8,7 @@ from django.db import models
 from django.utils import timezone
 
 import consts
+from news.apps.common.models import Gallery
 
 
 class Post(models.Model):
@@ -32,6 +33,9 @@ class Post(models.Model):
     is_publicated = models.BooleanField(default=False)
     is_commentable = models.BooleanField(default=True)
     slug = models.SlugField()
+
+    gallery = models.OneToOneField(Gallery, on_delete=models.CASCADE,
+                                   null=True, blank=True)
 
     class Meta:
         app_label = 'news'

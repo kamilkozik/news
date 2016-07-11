@@ -33,14 +33,13 @@
 
 </head>
 <body>
+    <nav>
+        {% block navigation %}
+            {% include 'global/base/navigation.html' %}
+        {% endblock %}
+    </nav>
 
     <div id="the-very-top">
-        <div id="header">
-            {% block header %}
-                {% include 'global/base/header.html' %}
-            {% endblock %}
-        </div>
-
         {% if request.session.bad_login and request.user.is_authenticated %}
         <div>
             You have tried to log in {{ request.session.bad_login }} times!
@@ -52,6 +51,9 @@
             You have entered wrong credentials {{ request.session.bad_login }} times.
         </div>
         {% endif %}
+
+        {% block jumbotron %}
+        {% endblock jumbotron %}
 
         <div id="content-wrapper">
             {% block content %}
